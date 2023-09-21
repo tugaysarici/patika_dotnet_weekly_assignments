@@ -1,7 +1,9 @@
 ﻿using Auto_Gallery.Models;
+using Azure.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,97 +25,67 @@ public class AutosController : ControllerBase
 
     // GET: api/Autos
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Auto>>> GetAutos()
+    public List<Auto> GetAutos()
     {
-        if(_dbContext.Autos == null)
-        {
-            return NotFound();
-        }
-
-        return await _dbContext.Autos.ToListAsync();
+        return _dbContext.Autos.ToList();
     }
 
     // Get: api/Autos/id/6
-    [HttpGet("id")]
-    public async Task<ActionResult<Auto>> GetAuto(int id)
+    [HttpGet("{id}")]
+    public Auto GetAuto(int id)
     {
-        if(_dbContext.Autos == null)
-        {
-            return NotFound();
-        }
-
-        var auto = await _dbContext.Autos.FindAsync(id);
-
-        if(auto == null)
-        {
-            return NotFound();
-        }
+        var auto = _dbContext.Autos.Find(id);
+        if (auto == null)
+            throw new Exception("Record not found.");
 
         return auto;
     }
 
     // Post: api/Autos
     [HttpPost]
-    public async Task<ActionResult<Auto>> PostAuto(Auto auto)
+    public IActionResult PostAuto([FromBody] Auto auto)
     {
-        _dbContext.Autos.Add(auto);
-        await _dbContext.SaveChangesAsync();
+        if (auto == null) return BadRequest();
 
-        return CreatedAtAction(nameof(GetAuto), new { id = auto.Id }, auto);
+        _dbContext.Autos.Add(auto);
+        _dbContext.SaveChanges();
+        return Ok("Recorded successfully.");
     }
 
     // Put: api/Autos/6
-    [HttpPut]
-    public async Task<IActionResult> PutAuto(int id, Auto auto)
+    [HttpPut("{id}")]
+    public IActionResult PutAuto(int id, [FromQuery] bool? status, [FromQuery] string? brand, [FromQuery] string? model, [FromQuery] int? modelYear,
+                        [FromQuery] DateTime? recordDate, [FromQuery] DateTime? soldDate, [FromQuery] int? price)
     {
-        if(id != auto.Id)
+        var autoToUpdate = _dbContext.Autos.FirstOrDefault(x => x.Id == id);
+        if (autoToUpdate != null)
         {
-            return BadRequest();
-        }
+            if (status != null) autoToUpdate.Status = status.Value;
+            if (brand != null) autoToUpdate.Brand = brand.ToString();
+            if (model != null) autoToUpdate.Model = model.ToString();
+            if (modelYear != null) autoToUpdate.ModelYear = modelYear.Value;
+            if (recordDate != null) autoToUpdate.RecordDate = recordDate.Value;
+            if (soldDate != null) autoToUpdate.SoldDate = soldDate.Value;
+            if(price != null) autoToUpdate.Price = price.Value;
 
-        _dbContext.Entry(auto).State = EntityState.Modified;
-
-        try
-        {
-            await _dbContext.SaveChangesAsync();
+            _dbContext.SaveChanges();
+            return Ok("Record updated successfully.");
         }
-        catch(DbUpdateConcurrencyException)
-        {
-            if(!AutoExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
-
-        return NoContent();
+        return NotFound("Record not found.");
     }
 
     // Delete: api/Auto/6
-    [HttpDelete("id")]
-    public async Task<IActionResult> DeleteAuto(int id)
+    [HttpDelete("{id}")]
+    public IActionResult DeleteAuto(int id)
     {
-        if (_dbContext.Autos == null)
+        var autoToDelete = _dbContext.Autos.FirstOrDefault(x => x.Id == id);
+
+        if(autoToDelete != null)
         {
-            return NotFound();
+            _dbContext.Autos.Remove(autoToDelete);
+            _dbContext.SaveChanges();
+            return Content("Record deleted successfully.");
         }
-
-        var auto = await _dbContext.Autos.FindAsync(id);
-        if(auto == null)
-        {
-            return NotFound();
-        }
-        _dbContext.Autos.Remove(auto);
-        await _dbContext.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    private bool AutoExists(long id)
-    {
-        return (_dbContext.Autos?.Any(e => e.Id == id)).GetValueOrDefault();
+        return NotFound("Record not found.");
     }
 }

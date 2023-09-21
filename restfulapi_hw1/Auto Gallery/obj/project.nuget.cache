@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xZAI/H5jBsRdCbTuGpSnHM6A4hjbtRsrzSBnUuAIUufnyZulOweneNQrT9NjeyzHYFBYONcClaAc4I+FJmbiZQ==",
+  "dgSpecHash": "Idl5V+hVZdeZfU9dddpNCpUDbF6BS1YM9UbYYrOYulGhXa6EAeZZJg6jSnU0qvFvMN1al5RUYo1Xxwe/6D8uPg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\TSRC\\Desktop\\Vakıfbank Fullstack Bootcamp\\Ödevler\\restfulapi_hw1\\Auto Gallery\\Auto Gallery.csproj",
+  "projectFilePath": "C:\\Users\\TSRC\\Desktop\\Vakıfbank Fullstack Bootcamp\\Ödevler\\patika_dotnet_weekly_assignments\\restfulapi_hw1\\Auto Gallery\\Auto Gallery.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\TSRC\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\TSRC\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
